@@ -1,8 +1,9 @@
-import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { createUserWithEmailAndPassword, sendEmailVerification } from 'firebase/auth';
 import React, { useState } from 'react'
 import auth from '../FIrebase/Firebase';
 import { FaEye } from "react-icons/fa";
 import { BsEyeSlash } from 'react-icons/bs';
+import { Link } from 'react-router-dom';
 
 export default function SignUp() {
 
@@ -20,7 +21,6 @@ export default function SignUp() {
 
         // reseat error message
         setErrorMessage('')
-
         setSuccess(false);
 
         //checked our terms and condition
@@ -49,7 +49,15 @@ export default function SignUp() {
             .then(result => {
                 console.log(result.user);
                 setSuccess(true)
+
+                // email Verification sent
+                sendEmailVerification(auth.currentUser)
+                .then(()=>{
+                    console.log('email verification success')
+                })
             })
+
+
             .catch(error => {
                 console.log('ERROR', error)
                 setErrorMessage(error.message)
@@ -110,6 +118,8 @@ export default function SignUp() {
                         {
                             success && <p className='text-green-400'>Sign Up successful</p>
                         }
+
+                        <p>Already have an Account? PLease <Link className='text-blue-500' to='/login'>Login</Link></p>
                     </form>
                 </div>
             </div>
