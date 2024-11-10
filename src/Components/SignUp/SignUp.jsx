@@ -1,29 +1,59 @@
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import React, { useState } from 'react'
 import auth from '../FIrebase/Firebase';
+import { FaEye } from "react-icons/fa";
+import { BsEyeSlash } from 'react-icons/bs';
 
 export default function SignUp() {
 
     const [errorMessage, setErrorMessage] = useState('')
 
+    const [success, setSuccess] = useState(false)
+    const [showPassword, setShowPassword] = useState(false)
 
     const handleSignUp = (event) => {
         event.preventDefault()
         const email = event.target.email.value;
         const password = event.target.password.value;
-        console.log(email, password)
+        const terms=event.target.terms.checked;
+        console.log(email, password,terms)
 
         // reseat error message
         setErrorMessage('')
 
+        setSuccess(false);
+
+        //checked our terms and condition
+        if(!terms){
+            setErrorMessage('Please Accept Our Terms And Condition');
+            return;
+        } 
+
+
+        // password should be 6 character
+        if (password.length < 6) {
+            setErrorMessage('Password Should be at last 6 Character or larger');
+            return;
+        }
+
+        // check password Validation
+        const passwordRegex = /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}$/;
+
+        if (!passwordRegex.test(password)) {
+            setErrorMessage('At List one Uppercase,one LowerCase,one Number and one Spacial character');
+            return;
+        }
+
         // create a email password authentication
         createUserWithEmailAndPassword(auth, email, password)
             .then(result => {
-                console.log(result.user)
+                console.log(result.user);
+                setSuccess(true)
             })
             .catch(error => {
                 console.log('ERROR', error)
                 setErrorMessage(error.message)
+                setSuccess(false)
             })
     }
 
@@ -42,14 +72,32 @@ export default function SignUp() {
                             </label>
                             <input type="email" name='email' placeholder="email" className="input input-bordered" required />
                         </div>
-                        <div className="form-control">
+                        <div className="form-control relative">
                             <label className="label">
                                 <span className="label-text">Password</span>
                             </label>
-                            <input type="password" name='password' placeholder="password" className="input input-bordered" required />
+
+                            <input type={showPassword ? 'text' : 'password'}
+                                name='password'
+                                placeholder="password" className="input input-bordered" required />
+
+                            <button
+                                onClick={() => setShowPassword(!showPassword)}
+                                className='btn btn-xs absolute right-2 top-12'>
+                                {showPassword ? <BsEyeSlash></BsEyeSlash> : <FaEye></FaEye>}
+                            </button>
+
                             <label className="label">
                                 <a href="#" className="label-text-alt link link-hover">Forgot password?</a>
                             </label>
+
+                            <div className="form-control">
+                                <label className="label cursor-pointer justify-start gap-2">
+                                    <input type="checkbox" name='terms' className="checkbox" />
+                                    <span className="label-text">Accept Out Trumps And Condition</span>
+
+                                </label>
+                            </div>
                         </div>
                         <div className="form-control mt-6">
                             <button className="btn btn-primary">Sign Up</button>
@@ -57,6 +105,10 @@ export default function SignUp() {
                         {
 
                             errorMessage && <p className='text-red-500'>{errorMessage}</p>
+                        }
+
+                        {
+                            success && <p className='text-green-400'>Sign Up successful</p>
                         }
                     </form>
                 </div>
