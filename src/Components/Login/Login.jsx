@@ -1,9 +1,11 @@
-import { signInWithEmailAndPassword } from 'firebase/auth';
-import React, { useState } from 'react'
+import { sendPasswordResetEmail, signInWithEmailAndPassword } from 'firebase/auth';
+import React, { useRef, useState } from 'react'
 import auth from '../FIrebase/Firebase';
 import { Link } from 'react-router-dom';
 
 export default function Login() {
+  const emailRef = useRef()
+
   const [success, setSuccess] = useState(false)
   const [loginError, setLoginError] = useState('')
 
@@ -35,6 +37,22 @@ export default function Login() {
         setLoginError(error.message)
       })
   }
+
+  // forget password manage
+  const handleForgetPassword = () => {
+    console.log('get me your email address', emailRef.current.value);
+    const email = emailRef.current.value;
+    if (!email) {
+      console.log('Please Provide your email Address')
+    }
+    else {
+      sendPasswordResetEmail(auth, email)
+      .then(()=>{
+        alert('Password resat email please check your email')
+      })
+    
+    }
+  }
   return (
     <div>
       <h2 className='text-2xl'>Login</h2>
@@ -44,14 +62,14 @@ export default function Login() {
             <label className="label">
               <span className="label-text">Email</span>
             </label>
-            <input type="email" name='email' placeholder="email" className="input input-bordered" required />
+            <input type="email" name='email' ref={emailRef} placeholder="email" className="input input-bordered" required />
           </div>
           <div className="form-control">
             <label className="label">
               <span className="label-text">Password</span>
             </label>
             <input type="password" name='password' placeholder="password" className="input input-bordered" required />
-            <label className="label">
+            <label onClick={handleForgetPassword} className="label">
               <a href="#" className="label-text-alt link link-hover">Forgot password?</a>
             </label>
           </div>

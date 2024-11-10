@@ -1,4 +1,4 @@
-import { createUserWithEmailAndPassword, sendEmailVerification } from 'firebase/auth';
+import { createUserWithEmailAndPassword, sendEmailVerification, updateProfile } from 'firebase/auth';
 import React, { useState } from 'react'
 import auth from '../FIrebase/Firebase';
 import { FaEye } from "react-icons/fa";
@@ -16,18 +16,20 @@ export default function SignUp() {
         event.preventDefault()
         const email = event.target.email.value;
         const password = event.target.password.value;
-        const terms=event.target.terms.checked;
-        console.log(email, password,terms)
+        const terms = event.target.terms.checked;
+        const name=event.target.name.value;
+        const photo=event.target.photo.value;
+        console.log(email, password,name,photo, terms)
 
         // reseat error message
         setErrorMessage('')
         setSuccess(false);
 
         //checked our terms and condition
-        if(!terms){
+        if (!terms) {
             setErrorMessage('Please Accept Our Terms And Condition');
             return;
-        } 
+        }
 
 
         // password should be 6 character
@@ -52,9 +54,22 @@ export default function SignUp() {
 
                 // email Verification sent
                 sendEmailVerification(auth.currentUser)
-                .then(()=>{
-                    console.log('email verification success')
-                })
+                    .then(() => {
+                        console.log('email verification success')
+                    })
+
+                    // name and photo Url
+                    const profile={
+                        displayName:name,
+                        photoURL:photo
+                    }
+                    updateProfile(auth.currentUser,profile)
+                    .then(()=>{
+                        console.log('user Profile updated')
+                    })
+                    .catch((error)=>{
+                        console.log('ERROR',error)
+                    })
             })
 
 
@@ -74,6 +89,18 @@ export default function SignUp() {
 
                 <div className="card bg-base-100 w-full max-w-sm shrink-0 shadow-2xl">
                     <form onSubmit={handleSignUp} className="card-body">
+                        <div className="form-control">
+                            <label className="label">
+                                <span className="label-text">Name</span>
+                            </label>
+                            <input type="text" name='name' placeholder="Name" className="input input-bordered" required />
+                        </div>
+                        <div className="form-control">
+                            <label className="label">
+                                <span className="label-text">Photo Url</span>
+                            </label>
+                            <input type="text" name='photo' placeholder="Photo Url" className="input input-bordered" required />
+                        </div>
                         <div className="form-control">
                             <label className="label">
                                 <span className="label-text">Email</span>
