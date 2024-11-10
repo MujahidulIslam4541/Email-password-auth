@@ -1,18 +1,32 @@
+import { createUserWithEmailAndPassword } from 'firebase/auth';
 import React from 'react'
+import auth from '../FIrebase/Firebase';
+
 
 export default function Register() {
 
-    const handleSubmit = (event) => {
+    const handleRegister = (event) => {
         event.preventDefault()
         const email = event.target.email.value;
         const password = event.target.password.value;
         console.log('Email:', email, 'Password:', password)
+
+        createUserWithEmailAndPassword(auth, email, password)
+            .then(result => {
+                console.log(result.user)
+            })
+            .catch(error => {
+                console.log('ERROR', error)
+            })
+
+
     }
+
     return (
         <div className='max-w-md mx-auto mt-10 bg-slate-300 rounded-xl border shadow-md px-10'>
             <h2 className="text-2xl my-8 text-black">Register</h2>
 
-            <form onSubmit={handleSubmit}>
+            <form onSubmit={handleRegister}>
 
                 <label className="input my-8 text-black bg-transparent input-bordered flex items-center gap-2">
                     <svg
